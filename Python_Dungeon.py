@@ -248,7 +248,7 @@ def main_screen():
     elif choice == "2":
         clear()
         exit()
-    elif chocie == "3":
+    elif choice == "3":
         clear()
         stats()
     else:
