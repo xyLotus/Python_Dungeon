@@ -1,0 +1,10 @@
+{
+  "item": {
+    "coin": "Coin",
+    "gold_coin": "Gold Coin",
+    "paper": "Paper",
+    "apple": "Apple",
+    "basic_sword": "Basic Sword",
+    "basic_armor": "Basic Armor"
+  }
+}
