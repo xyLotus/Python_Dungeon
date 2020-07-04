@@ -7,39 +7,33 @@ We created this project out of boredom and fun, I hope you enjoy it!
 - Background Developer: bellrise
 
 
-### Player instance interaction
+#### Player instance interaction
 
 Create a new Player:
 ````python
 self.Player = player.Player(username)
 ````
 
-
-
-
 ##### Player Inventory interaction
 
-Adding items 
-```python
+
+````python
+# Adding items
 self.Player.INVENTORY.add('<ItemID>', amount)
-```
 
-Removing items
-````python
+
+# Removing items
 self.Player.INVENTORY.remove('<ItemID>', amount)
-````
 
-Adding a list of items
-````python
+
+# Adding a list of items
 self.Player.INVENTORY.add_list(<ItemIDList>)
-````
 
-Clearing the inventory
-````python
+
+# Clearing the inventory
 self.Player.INVENTORY.clear()
-````
 
-Printing the inventory
-````python
+
+# Printing the inventory
 print(self.Player.INVENTORY)
-```` 
+````
