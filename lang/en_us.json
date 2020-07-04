@@ -1,0 +1,8 @@
+{
+  "item": {
+    "coin": "Coin",
+    "silver_coin": "Silver Coin",
+    "paper": "Paper",
+    "apple": "Apple"
+  }
+}
