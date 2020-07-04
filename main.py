@@ -20,12 +20,14 @@ class Main:
 
     @staticmethod
     def _validator(d):
+        """ Checks if the difficulty is valid """
         if d == '1' or d == '2' or d == '3':
             return True
         else:
             return False
 
     def _difficulty(self):
+        """ Formats the difficulty setting into a string """
         i = self.difficulty
         if i == '1':
             out = 'Easy'
@@ -37,11 +39,12 @@ class Main:
 
     @property
     def userdata(self):
+        """ Used for reading userdata """
         return 'Username @ ' + self.username, \
                'Difficulty @ ' + self.difficulty
 
 
-# Program start
+# The actual game
 print('Welcome to the Python Dungeon! ' + version)
 main = Main()
 
