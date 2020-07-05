@@ -1,54 +1,44 @@
-import controller
+import player
+import event
 
 # Global definitions
 version = '0.0.1'
 
 
 class Main:
-    # This is responsible for taking data from the user, like
-    # username and difficulty
+    """
+    Main class with all the functionality
+    """
     def __init__(self):
+        """
+        User name and difficulty selection. Creates the Player
+        and EventHandler instance.
+        """
         self.username = input('\nYour name: ')
-        self.difficulty = None
 
-        print('\nSelect your difficulty: 1 - easy, 2 - normal, 3 - hard')
-        while self._validator(self.difficulty) is False:
-            self.difficulty = input('Difficulty: ')
-        self._difficulty()
+        # Creates a new player
+        self.Player = player.Player(self.username)
+        self.Event = event.EventHandler(self.username)
 
-        controller.Controller(self.username, self.difficulty)
+        # Starts the game
+        self.main()
 
-    @staticmethod
-    def _validator(d):
-        """ Checks if the difficulty is valid """
-        if d == '1' or d == '2' or d == '3':
-            return True
-        else:
-            return False
+    def main(self):
+        """
+        This is the main method called when the program starts.
+        Place all game functionality here, external classes and
+        methods can be used.
+        """
+        print('Welcome to the Python Dungeon! ' + version)
 
-    def _difficulty(self):
-        """ Formats the difficulty setting into a string """
-        i = self.difficulty
-        if i == '1':
-            out = 'Easy'
-        elif i == '2':
-            out = 'Normal'
-        else:
-            out = 'Hard'
-        self.difficulty = out
+        # Game
 
-    @property
-    def userdata(self):
-        """ Used for reading userdata """
-        return 'Username @ ' + self.username, \
-               'Difficulty @ ' + self.difficulty
+        self.Player.INVENTORY.add('coin', 3)
 
 
-# The actual game
-print('Welcome to the Python Dungeon! ' + version)
-main = Main()
-
-input('\n\n\n[Press ENTER to exit]')
+# Game initialization and screen hold
+run = Main()
+input()
 
 # So many people don't like cheese. Do you actually like cheese?
 # I actually do as a matter of fact.
