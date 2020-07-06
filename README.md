@@ -39,11 +39,11 @@ There is two ways of doing this, either using `getuuid()` or accesing the items 
 The first way is only if you have a single item with the ItemID.
 ```python
 # First way
-uuid = self.Player.INVENTORY.getuuid('<ItemID>')
+uuid = self.Player.INVENTORY.getuuid(<ItemID>)
 # Note: This way gets ONLY THE FIRST item with the matching ItemID
 
 # Second way (will return a list of them)
-uuids = list(self.Player.INVENTORY.getuuids('<ItemID>')
+uuids = list(self.Player.INVENTORY.getuuids(<ItemID>)
 ```
 
 #### Getting a item object
@@ -53,7 +53,7 @@ Using a ItemID is easier, but works as long as you have one instance of that ite
 With a UUID you can choose the particular item, even if there are multiple with the same ItemID.
 ```python
 # Using the ItemID
-item = self.Player.INVENTORY.get('<ItemID>')
+item = self.Player.INVENTORY.get(<ItemID>)
 
 # Using a UUID
 item = self.Player.INVENTORY.uget(<UUID>)
@@ -66,7 +66,7 @@ or using Inventory methods to do so.
 Using Inventory methods:
 ```python
 # Creating a new item
-self.Player.INVENTORY.new('<ItemID>', '<ItemType>', amount=<amount>, ...) 
+self.Player.INVENTORY.new(<ItemID>, <ItemType>, amount=<amount>, ...) 
 
 # Deleting a item
 self.Player.INVENTORY.delete(<UUID>)
@@ -91,7 +91,7 @@ Note: `item` is the previously created item object with `get()` or `uget()`.
 item.AMOUNT = <value>
 
 # You can do this with every item attribute
-item.<ATTRIBUTE> = <value>
+item.<attribute> = <value>
 
 
 # Printing the inventory
@@ -128,10 +128,23 @@ from serialization import Pack
 ...
 
 # Packing
-Pack.save(<object>, <path: str>)
+Pack.save(<object>, <path>)
 
 # Unpacking
 obj = Pack.load(<path: str>)
 ```
 The packing and unpacking is handled by `pickle`, so loading the packed file will return a class instance, with all the methods and attributes.
 Note: Every kind of data can be saved, not only class instances.
+
+## Data values
+```
+Examples
+
+<ItemID>    = 'this_is_a_item_id'                     # lowercase with underscores
+<UUID>      = '9c385152-e8a4-4d69-8eb3-439158a799e2'  # auto-generated str
+<amount>    = 12                                      # int
+<value>     = 3 | 'something'                         # can be a string or a int
+<path>      = 'file/players/test.txt'                 # only forward-slashes
+<attribute> = EXAMPLEATTRIBUTE                        # all caps no spaces
+<object>    = <type.Food object at 0x02E5E838>        # class instance
+```
