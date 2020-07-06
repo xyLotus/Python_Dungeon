@@ -140,3 +140,6 @@ Examples
 <attribute> = EXAMPLEATTRIBUTE                        # all caps no spaces
 <object>    = <type.Food object at 0x02E5E838>        # class instance
 ```
+
+## What not to do:
+- Do not `import main` **anywhere** because it will most likely result in a `RecursionError` 
