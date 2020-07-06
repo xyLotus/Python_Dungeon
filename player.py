@@ -90,14 +90,18 @@ class _Inventory:
         """ Returns the list of object pointers """
         return self.REGISTER
 
-    def get(self, iid_):
+    def get(self, iid_) -> object:
         """ Returns the first item with the selected ItemID """
         uuid_ = self._getuuid(iid_)
         return self._getitem(uuid_)
 
-    def uget(self, uuid_):
+    def uget(self, uuid_) -> object:
         """ Returns a item using its uuid """
         return self._getitem(uuid_)
+
+    def getdata(self, uuid_) -> dict:
+        """ Returns the data dictionary """
+        return self._getitem(uuid_).DATA
 
     def getuuid(self, iid_):
         """ Get the UUID of the first object with the ItemID """
