@@ -1,4 +1,4 @@
-# Instructions for using the tools
+# Tools documentation
 
 ### Player instance creation
 
@@ -123,7 +123,7 @@ from serialization import Pack
 Pack.save(<object>, <path>)
 
 # Unpacking
-obj = Pack.load(<path: str>)
+obj = Pack.load(<path>)
 ```
 The packing and unpacking is handled by `pickle`, so loading the packed file will return a class instance, with all the methods and attributes.
 Note: Every kind of data can be saved, not only class instances.
