@@ -34,7 +34,7 @@ The first way is only if you have a single item with the ItemID.
 uuid = self.Player.INVENTORY.getuuid(<ItemID>)
 # Note: This way gets ONLY THE FIRST item with the matching ItemID
 
-# Second way (will return a list of them)
+# Second way (will return a list of them for each item with the matching ItemID)
 uuids = list(self.Player.INVENTORY.getuuids(<ItemID>)
 ```
 ___
@@ -50,6 +50,18 @@ item = self.Player.INVENTORY.get(<ItemID>)
 # Using a UUID
 item = self.Player.INVENTORY.uget(<UUID>)
 ```
+___
+#### Getting item data
+This is simmilar to getting the item object, but here you get a dictionary containing all the values of the item.
+```python
+data = self.Player.INVENTORY.getdata(<UUID>)
+```
+The data dict contains all the item attributes, as well as its ItemID *and* UUID
+
+Example: 
+> `{'iid': 'apple', 'uuid': '314ef704-7a6b-4952-967d-4114817e0546', ... }`
+
+**Note**: this only works for a UUID, not for a ItemID. 
 ___
 #### Creating and modifying items
 After getting the item, operations can be done on the item object directly changing its values,
