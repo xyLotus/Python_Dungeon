@@ -15,7 +15,7 @@ Creating a new player:
 ````python
 self.Player = player.Player(username)
 ````
-
+___
 ### Player inventory interaction
 
 The `INVENTORY` attribute of the `Player` instance is actually a hidden class with several methods
@@ -28,12 +28,13 @@ x = self.Player.INVENTORY.register
 ```
 Printing the register will result in a list of unreadable instance pointers
 
-Example: `[<type.Food object at 0x02E5E838>, <type.Weapon object at 0x02E5E868>]`
+Example: 
+> `[<type.Food object at 0x02E5E838>, <type.Weapon object at 0x02E5E868>]`
 
 For better readability, printing the `INVENTORY` itself will yield a string of ItemIDs with their types:
-`Food.apple, Weapon.sword`
+> `Food.apple, Weapon.sword`
 
-
+___
 #### Getting the UUID of an item
 There is two ways of doing this, either using `getuuid()` or accesing the items in the registry.
 The first way is only if you have a single item with the ItemID.
@@ -45,12 +46,12 @@ uuid = self.Player.INVENTORY.getuuid(<ItemID>)
 # Second way (will return a list of them)
 uuids = list(self.Player.INVENTORY.getuuids(<ItemID>)
 ```
-
+___
 #### Getting a item object
 To modify a item you need to operate on the item object itself.
-First, you need to get that item using it's ItemID or UUID.
-Using a ItemID is easier, but works as long as you have one instance of that item.
-With a UUID you can choose the particular item, even if there are multiple with the same ItemID.
+First, you need to get that item using it's _ItemID_ or _UUID_.
+Using a _ItemID_ is easier, but works as long as you have one instance of that item.
+With a _UUID_ you can choose the particular item, even if there are multiple with the same _ItemID_.
 ```python
 # Using the ItemID
 item = self.Player.INVENTORY.get(<ItemID>)
@@ -58,7 +59,7 @@ item = self.Player.INVENTORY.get(<ItemID>)
 # Using a UUID
 item = self.Player.INVENTORY.uget(<UUID>)
 ```
-
+___
 #### Creating and modifying items
 After getting the item, operations can be done on the item object directly changing its values,
 or using Inventory methods to do so.
@@ -97,7 +98,7 @@ item.<attribute> = <value>
 # Printing the inventory
 print(self.Player.INVENTORY)
 ```
-
+___
 #### Other inventory methods
 ```python
 # Getting the list of ItemIDs
