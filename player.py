@@ -1,8 +1,9 @@
 """
 All of the players' data is stored in a instance of PlayerData.
 """
-import type
 import json
+import type as itype
+import uuid
 
 
 class Player:
@@ -21,49 +22,20 @@ class Player:
         self.HP = int()
         self.XP = int()
         self.INVENTORY = _Inventory()  # Inventory Object
+        self.WALLET = _Wallet()  # Amount of wealth/money
         self.HISTORY = list()  # History of Events
 
     def save(self):
         """
-        Saves the current Player data in a json file found in
-        /players/<username>.json
-
-        Items in the inventory are stored with ItemIDs, not the
-        instance pointers.
+        This functionality has been moved to the Serialization system
         """
-        player_data = {'name': self.NAME,
-                       'sysname': self.SYSNAME,
-                       'hp': self.HP,
-                       'xp': self.XP,
-                       'inventory': self.INVENTORY.data,
-                       'history': self.HISTORY}
-
-        with open('players/' + self.SYSNAME + '.json', 'w') as f:
-            data = json.dumps(player_data, indent=2)
-            f.write(data)
+        raise NotImplementedError('save() has been moved to serialization')
 
     def load(self):
         """
-        Loads the player data from /players/<username>.json
-        and overwrites the current player data.
-        Because items are saved as ItemIDs not as instance
-        pointer, it cleans the inventory and adds the items
-        to it, creating a Item instance from each ItemID
+        This functionality has been moved to the Serialization system
         """
-        with open('players/' + self.SYSNAME + '.json') as f:
-            data = json.loads(f.read())
-
-        # Data loading
-        self.NAME = data['name']
-        self.SYSNAME = data['sysname']
-        self.HP = data['hp']
-        self.XP = data['xp']
-        self.HISTORY = data['history']
-
-        # Loads data into Inventory instance
-        self.INVENTORY.clear()
-        for item in data['inventory']:
-            self.INVENTORY.add(item, data['inventory'][item])
+        raise NotImplementedError('load() has been moved to serialization')
 
 
 class _Inventory:
@@ -74,122 +46,158 @@ class _Inventory:
 
     def __init__(self):
         """
-        This is where items are registered calling the Item class
-        and it's subclasses. Creating a new item is quite simple:
+        This is where the item register is created for use within
+        the _Inventory class. There is only one item register for
+        a player throughout the whole process.
 
-            self.<ItemID> = type.<ItemType>('<ItemID>', value, *)
-
-        <ItemID> -> ItemIDs are lower_case_with_underscores
-        <ItemType> -> Item types are registered in type.py/
-
-        After registering the item here, it should be added to
-        /lang/default.json. The key is the ItemID.
-        If a default translation is not specified, it will
-        fall back to the ItemID.
+        The register is a single-level list containing only pointers
+        for the item instances created with the ItemTypes classes.
+        The amount of items is stored inside the class instance.
         """
-        self.LOCAL = {}
+        self.REGISTER = []
 
-        # Item registry
-        self.coin = type.Item('coin', 1)
-        self.gold_coin = type.Item('gold_coin', 100)
-        self.paper = type.Item('paper', 10)
-        self.apple = type.Food('apple', 2, 120)
-        self.basic_sword = type.Weapon('basic_sword', 15, 5)
-        self.basic_armor = type.Armor('basic_armor', 15, 5)
+    def _getitem(self, uuid_):
+        """ Returns the item with the selected uuid """
+        for pos, ptr in enumerate(self.REGISTER):
+            if ptr.UUID == uuid_:
+                return ptr
 
-    def add(self, iid: str, amount: int):
-        """
-        Adds a item to the LOCAL item list using its ItemID.
-        Supports adding items (current + additional).
-        If the item was not registered in __init__,
-        it will warn with > 'this' has not been registered yet <
-        """
-        try:
-            exec(f"self.LOCAL[self.{iid}] += amount")
-        except KeyError:
-            exec(f"self.LOCAL[self.{iid}] = amount")
-        except AttributeError:
-            print(f"'{iid}' has not been registered yet")
+        raise InventoryError('Item not found')
 
-        len([self.LOCAL, amount])  # voiding vars, don't mind it
+    def _getuuid(self, iid_):
+        """ Returns the uuid of the first item with the iid """
+        for pos, ptr in enumerate(self.REGISTER):
+            if ptr.ITEMID == iid_:
+                return ptr.UUID
 
-    def add_list(self, array: list):
-        """
-        Adds a list of items to the LOCAL item list using add()
-        Multiple items are supported, they just need to referenced
-        more than once in the passed list.
-        """
-        for item in array:
-            self.add(item, 1)
+        raise InventoryError('Item not found')
 
-    def remove(self, iid: str, amount):
-        """
-        Remove a particular item from the list using its ItemID.
-        You can either remove a amount of items or all of them using
-        a int or 'ALL' in the amount argument.
+    def _getitempos(self, uuid_):
+        """ Returns the position of the item in the register """
+        for pos, ptr in enumerate(self.REGISTER):
+            if ptr.UUID == uuid_:
+                return pos
 
-        Removing more items than there is in the inventory will result
-        in raising a ItemError. Same goes for nonexistent items.
-        """
-        try:
-            if amount == 'ALL':
-                exec(f"del self.LOCAL[self.{iid}]")
-            else:
-                exec(f"if self.LOCAL[self.{iid}] < amount:"
-                     f"\n\traise ItemError('Not enough items in inventory"
-                     f" to remove')"
-                     f"\nelse:\n\tself.LOCAL[self.{iid}] -= amount")
+        raise InventoryError('Item not found')
 
-
-        except KeyError:
-            raise ItemError('This item does not exist in the inventory')
-
-        len([self.LOCAL])  # voiding vars
-
-    def clear(self):
-        """ Clear the whole inventory, all the items. """
-        self.LOCAL = {}
-
-    def __len__(self) -> int:
-        """
-        Returns the total amount of items in the inventory,
-        adds all the item amounts.
-        """
-        local = int()
-        for i in self.LOCAL:
-            local += self.LOCAL[i]
-        return local
-
-    def __str__(self) -> str:
-        """
-        Returns a pretty version of the Inventory dictionary, using
-        already localized names and the amount. For developer friendly
-        data use 'Player.INVENTORY.data' instead.
-        """
-        out = []
-        for i in self.LOCAL:
-            if str(self.LOCAL[i]) != '1':
-                out.append(str(i) + ' x' + str(self.LOCAL[i]))
-            else:
-                out.append(str(i))
-
-        return '\nYour Inventory:\n | ' + '\n | '.join(out) + '\n'
+    def __str__(self):
+        """ Returns the list of ItemIDs in the register """
+        names = (ptr.TYPE + '.' + ptr.ITEMID for ptr in self.REGISTER)
+        return ', '.join(names)
 
     @property
-    def data(self) -> dict:
-        """
-        Returns the developer friendly dictionary of the current
-        player inventory, with names as ItemIDs, not class pointers.
-        """
-        temp = {}
-        for i in self.LOCAL:
-            temp[repr(i)] = self.LOCAL[i]
-        return temp
+    def register(self):
+        """ Returns the list of object pointers """
+        return self.REGISTER
+
+    def get(self, iid_):
+        """ Returns the first item with the selected ItemID """
+        uuid_ = self._getuuid(iid_)
+        return self._getitem(uuid_)
+
+    def uget(self, uuid_):
+        """ Returns a item using its uuid """
+        return self._getitem(uuid_)
+
+    def getuuid(self, iid_):
+        """ Get the UUID of the first object with the ItemID """
+        return self._getuuid(iid_)
+
+    def getuuids(self, iid_):
+        """ Gets the list of matching ItemIDs """
+        for i in self.REGISTER:
+            if i.ITEMID == iid_:
+                yield i.UUID
+
+    def new(self, iid: str, itemtype: str, **kwargs):
+        """ Adds a new item to the register """
+        uuid_ = str(uuid.uuid4())
+        try:
+            exec(f"self.{iid} = itype.{itemtype}('{iid}', '{uuid_}', kwargs)")
+            exec(f"self.REGISTER.append(self.{iid})")
+        except KeyError:
+            print(f"[!] Not enough data passed for '{iid}'")
+
+        # Voiding
+        type(kwargs)
+        type(self)
+
+    def delete(self, uuid_):
+        """ Removes a item """
+        pos = self._getitempos(uuid_)
+        del self.REGISTER[pos]
+
+    def add(self, uuid_, amount):
+        """ Adds a certain amount of items to the object """
+        item = self._getitem(uuid_)
+        item.DATA['amount'] += amount
+
+    def remove(self, uuid_, amount):
+        """ Removes a certain the amount of items from the object """
+        item = self._getitem(uuid_)
+        if item.DATA['amount'] >= amount:
+            item.DATA['amount'] -= amount
+        else:
+            raise InventoryError('Cannot remove more items then there is')
+
+    def clear(self):
+        """ Clears the whole inventory, leaves a empty register """
+        self.REGISTER = []
+
+    @property
+    def ids(self) -> list:
+        """ Returns a list of item ids """
+        ids = list(ptr.TYPE + '.' + ptr.ITEMID for ptr in self.REGISTER)
+        return ids
+
+    @property
+    def uuids(self) -> list:
+        """ Returns the uuids of the objects """
+        uuids = list(ptr.UUID for ptr in self.REGISTER)
+        return uuids
 
 
-class ItemError(Exception):
+class _Wallet:
+    """
+    The Wallet class adds complex interaction with the funds
+    a player has.
+    """
+
+    def __init__(self):
+        """ Creates a wallet """
+        self.MONEY = int()
+
+    def add(self, amount):
+        """ Add a certain amount of money to the wallet """
+        self.MONEY += amount
+
+    def remove(self, amount):
+        """ Remove money from the wallet """
+        self.MONEY -= amount
+
+    def __str__(self):
+        """ Returns the amount of money """
+        return str(self.MONEY)
+
+    @property
+    def get(self):
+        """ Returns the amount of money as a int """
+        return self.MONEY
+
+    @property
+    def pretty(self):
+        """ Returns a formatted version of the 'balance' """
+        return None
+
+
+class InventoryError(Exception):
     """
     This is raised when something goes wrong with the removal
     of items form the current inventory.
     """
     pass
+
+
+# void
+type(json)
+type(itype)
