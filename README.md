@@ -34,10 +34,7 @@ For better readability, printing the `INVENTORY` itself will yield a string of I
 `Food.apple, Weapon.sword`
 
 
-
-#### Creating and operating on items
-
-##### Getting the UUID of an item
+#### Getting the UUID of an item
 There is two ways of doing this, either using `getuuid()` or accesing the items in the registry.
 The first way is only if you have a single item with the ItemID.
 ```python
@@ -49,7 +46,7 @@ uuid = self.Player.INVENTORY.getuuid('<ItemID>')
 uuids = list(self.Player.INVENTORY.getuuids('<ItemID>')
 ```
 
-##### Getting a item object
+#### Getting a item object
 To modify a item you need to operate on the item object itself.
 First, you need to get that item using it's ItemID or UUID.
 Using a ItemID is easier, but works as long as you have one instance of that item.
@@ -62,7 +59,7 @@ item = self.Player.INVENTORY.get('<ItemID>')
 item = self.Player.INVENTORY.uget(<UUID>)
 ```
 
-##### Creatinng and modifying items
+#### Creating and modifying items
 After getting the item, operations can be done on the item object directly changing its values,
 or using Inventory methods to do so.
 
@@ -101,7 +98,7 @@ item.<ATTRIBUTE> = <value>
 print(self.Player.INVENTORY)
 ```
 
-##### Other inventory methods
+#### Other inventory methods
 ```python
 # Getting the list of ItemIDs
 x = self.Player.INVENTORY.ids
