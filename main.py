@@ -14,8 +14,8 @@ class Main:
         User name and difficulty selection. Creates the Player
         and EventHandler instance.
         """
-        # self.username = input('\nYour name: ')
-        self.username = 'TESTING_ACCOUNT'
+        self.username = input('\nYour name: ')
+        
         # Creates a new player
         self.Player = player.Player(self.username)
         self.Event = event.EventHandler(self.username)
