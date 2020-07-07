@@ -1,9 +1,10 @@
-"""
-All of the players' data is stored in a instance of PlayerData.
-"""
+# Imports
 import json
 import type as itype
 import uuid
+
+# Global definitions
+errors_raised = []
 
 
 class Player:
@@ -55,6 +56,7 @@ class _Inventory:
         The amount of items is stored inside the class instance.
         """
         self.REGISTER = []
+        self.errors_raised = errors_raised
 
     def _getitem(self, uuid_):
         """ Returns the item with the selected uuid """
@@ -62,7 +64,7 @@ class _Inventory:
             if ptr.UUID == uuid_:
                 return ptr
 
-        raise InventoryError('Item not found')
+        error('Item not found with ->', uuid_)
 
     def _getuuid(self, iid_):
         """ Returns the uuid of the first item with the iid """
@@ -70,7 +72,7 @@ class _Inventory:
             if ptr.ITEMID == iid_:
                 return ptr.UUID
 
-        raise InventoryError('Item not found')
+        error('Item not found with ->', iid_)
 
     def _getitempos(self, uuid_):
         """ Returns the position of the item in the register """
@@ -78,7 +80,7 @@ class _Inventory:
             if ptr.UUID == uuid_:
                 return pos
 
-        raise InventoryError('Item not found')
+        error('Item not found with ->', uuid_)
 
     def __str__(self):
         """ Returns the list of ItemIDs in the register """
@@ -156,7 +158,7 @@ class _Inventory:
             exec(f"self.REGISTER.append(self.{iid})")
 
         except KeyError:
-            print(f"[!] '{iid}' has not been registered yet")
+            error(f"'{iid}' has not been registered yet")
 
 
     def delete(self, uuid_):
@@ -175,7 +177,7 @@ class _Inventory:
         if item.AMOUNT >= amount:
             item.AMOUNT -= amount
         else:
-            raise InventoryError('Cannot remove more items then there is')
+            error('Cannot remove more items then there is')
 
     def clear(self):
         """ Clears the whole inventory, leaves a empty register """
@@ -198,8 +200,8 @@ class _Inventory:
         """ Returns the UUID of the newest item in the register """
         try:
             return self.REGISTER[-1].UUID
-        except KeyError:
-            return None
+        except IndexError:
+            return 'NONE'
 
 
 class _Wallet:
@@ -235,14 +237,11 @@ class _Wallet:
         return None
 
 
-class InventoryError(Exception):
-    """
-    This is raised when something goes wrong with the removal
-    of items form the current inventory.
-    """
-    pass
+def error(*msg):
+    """ Prints a warning to stout """
+    errors_raised.append(' '.join(msg))
+    print('[!] InventoryError:', ' '.join(msg))
 
 
-# void
-type(json)
+# voiding
 type(itype)
