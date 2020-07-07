@@ -1,0 +1,14 @@
+{
+  "apple": {
+    "type": "Food", "cal": 120
+  },
+  "paper": {
+    "type": "Stackable"
+  },
+  "basic_sword": {
+    "type": "Weapon", "damage": 10
+  },
+  "basic_armor": {
+    "type": "Armor", "prot": 10
+  }
+}
