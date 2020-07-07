@@ -4,7 +4,7 @@ import type as itype
 import uuid
 
 # Global definitions
-errors_raised = []
+error_setting = bool()
 
 
 class Player:
@@ -14,29 +14,22 @@ class Player:
     Creating a Player instance:
 
         Player = player.Player(username)
+
+    [!] Check __docs__ for better visuals and explanations
     """
 
-    def __init__(self, username):
-        # Initialize a new Player instance
-        self.NAME = username
-        self.SYSNAME = username.replace(' ', '_')
-        self.HP = int()
-        self.XP = int()
+    def __init__(self, username, raise_errors: bool = True):
+        # Initializes a new Player instance
+        self.NAME = username  # Player's username
+        self.HP = int()  # Health points
+        self.XP = int()  # Experience points
         self.INVENTORY = _Inventory()  # Inventory Object
         self.WALLET = _Wallet()  # Amount of wealth/money
         self.HISTORY = list()  # History of Events
 
-    def save(self):
-        """
-        This functionality has been moved to the Serialization system
-        """
-        raise NotImplementedError('save() has been moved to serialization')
-
-    def load(self):
-        """
-        This functionality has been moved to the Serialization system
-        """
-        raise NotImplementedError('load() has been moved to serialization')
+        # Setting for pushing or raising errors
+        global error_setting
+        error_setting = raise_errors
 
 
 class _Inventory:
@@ -56,25 +49,32 @@ class _Inventory:
         The amount of items is stored inside the class instance.
         """
         self.REGISTER = []
-        self.errors_raised = errors_raised
 
-    def _getitem(self, uuid_):
-        """ Returns the item with the selected uuid """
+    def _getitem(self, uuid_: str):
+        """
+        Internal function.
+        Returns the item object with the matching UUID.
+        Raises a item not found warning upon failure.
+        """
         for pos, ptr in enumerate(self.REGISTER):
             if ptr.UUID == uuid_:
                 return ptr
 
         error('Item not found with ->', uuid_)
 
-    def _getuuid(self, iid_):
-        """ Returns the uuid of the first item with the iid """
+    def _getuuid(self, iid_: str):
+        """
+        Internal function.
+        Returns the UUID of the first found object
+        Raises a item not found warning upon failure.
+        """
         for pos, ptr in enumerate(self.REGISTER):
             if ptr.ITEMID == iid_:
                 return ptr.UUID
 
         error('Item not found with ->', iid_)
 
-    def _getitempos(self, uuid_):
+    def _getitempos(self, uuid_: str):
         """ Returns the position of the item in the register """
         for pos, ptr in enumerate(self.REGISTER):
             if ptr.UUID == uuid_:
@@ -92,16 +92,16 @@ class _Inventory:
         """ Returns the list of object pointers """
         return self.REGISTER
 
-    def get(self, iid_) -> object:
+    def get(self, iid_: str) -> object:
         """ Returns the first item with the selected ItemID """
         uuid_ = self._getuuid(iid_)
         return self._getitem(uuid_)
 
-    def uget(self, uuid_) -> object:
+    def uget(self, uuid_: str) -> object:
         """ Returns the item instance by finding its unique UUID """
         return self._getitem(uuid_)
 
-    def getdata(self, uuid_) -> dict:
+    def getdata(self, uuid_: str) -> dict:
         """
         Returns the dictionary containing all the data contained
         in the class instance. The first item in the dict is always
@@ -111,14 +111,14 @@ class _Inventory:
         """
         return self._getitem(uuid_).DATA
 
-    def getuuid(self, iid_):
+    def getuuid(self, iid_: str):
         """
         Returns the UUID of the first object found in the inventory
         with the matching ItemID
         """
         return self._getuuid(iid_)
 
-    def getuuids(self, iid_):
+    def getuuids(self, iid_: str):
         """
         Returns the list of all UUIDs of the objects that match
         the given ItemID.
@@ -130,15 +130,9 @@ class _Inventory:
     def new(self, iid: str, amount: int = 1):
         """
         Creates a new item instance and adds the pointer to the
-        register. For this to not raise an error, enough data
-        needs to be passed. Import note: the data needs to be
-        passed in a specific order to work for sure.
-
-        > Player.INVENTORY.new('apple', 'Food', amount=12, ...)
-        args -> ( ItemID, ItemType, **kwargs )
-
-        If 3 or more normal arguments will be passed, it will
-        raise an error.
+        register. For this to not raise an error a valid ItemID
+        needs to passed. Before creating an item it needs to be
+        registered in src/ItemRegistry.json.
         """
         uuid_ = str(uuid.uuid4())
 
@@ -150,7 +144,7 @@ class _Inventory:
                 kwargs = iregister[iid]
                 kwargs['amount'] = amount
                 itemtype = kwargs['type']
-
+                # Clearing the type from the data dict
                 del kwargs['type']
 
             # Creating the object instance and appending it to the register
@@ -196,7 +190,7 @@ class _Inventory:
         return uuids
 
     @property
-    def lastuuid(self):
+    def lastuuid(self) -> str:
         """ Returns the UUID of the newest item in the register """
         try:
             return self.REGISTER[-1].UUID
@@ -209,38 +203,63 @@ class _Wallet:
     The Wallet class adds complex interaction with the funds
     a player has.
     """
-
     def __init__(self):
         """ Creates a wallet """
-        self.MONEY = int()
+        self.BALANCE = int()
 
     def add(self, amount):
         """ Add a certain amount of money to the wallet """
-        self.MONEY += amount
+        self.BALANCE += amount
 
     def remove(self, amount):
         """ Remove money from the wallet """
-        self.MONEY -= amount
+        self.BALANCE -= amount
 
-    def __str__(self):
+    def __str__(self) -> str:
         """ Returns the amount of money """
-        return str(self.MONEY)
+        return str(self.BALANCE)
 
-    @property
-    def get(self):
+    def __int__(self) -> int:
         """ Returns the amount of money as a int """
-        return self.MONEY
+        return self.BALANCE
 
     @property
-    def pretty(self):
+    def dollars(self) -> str:
         """ Returns a formatted version of the 'balance' """
-        return None
+        cents = self.BALANCE % 100
+        dollars = (self.BALANCE - cents) / 100
+        return '$' + str(int(dollars)) + '.' + str(cents)
+
+
+class _History:
+    """ Register for all the events that happened """
+    def __init__(self):
+        self.HISTORY = []
+
+    def write(self, name, round_num):
+        """ Appends a event to the history list """
+        self.HISTORY.append({'event': name, 'round': round_num})
+
+    @property
+    def get(self) -> list:
+        """ Returns the whole history """
+        return self.HISTORY
+
+
+class InventoryError(Exception):
+    """ Custom error for the Inventory class """
+    pass
 
 
 def error(*msg):
-    """ Prints a warning to stout """
-    errors_raised.append(' '.join(msg))
-    print('[!] InventoryError:', ' '.join(msg))
+    """
+    Depending on the error_setting, it either prints a warning
+    or raises a InventoryError exception
+    """
+    if error_setting:
+        raise InventoryError(' '.join(msg))
+    else:
+        print('[!] InventoryError:', ' '.join(msg))
 
 
 # voiding

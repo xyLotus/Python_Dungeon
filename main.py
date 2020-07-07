@@ -14,10 +14,10 @@ class Main:
         User name and difficulty selection. Creates the Player
         and EventHandler instance.
         """
-        self.username = input('\nYour name: ')
-        
+        # self.username = input('\nYour name: ')
+        self.username = 'TESTING_ACCOUNT'
         # Creates a new player
-        self.Player = player.Player(self.username)
+        self.Player = player.Player(self.username, False)
         self.Event = event.EventHandler(self.username)
 
         # Starts the game
@@ -33,7 +33,7 @@ class Main:
 
         # Game
 
-        self.Player.INVENTORY.new('apple', 3)
+        self.Player.INVENTORY.new('assad', 3)
 
 
 # Game initialization and screen hold
