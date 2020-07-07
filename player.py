@@ -96,35 +96,68 @@ class _Inventory:
         return self._getitem(uuid_)
 
     def uget(self, uuid_) -> object:
-        """ Returns a item using its uuid """
+        """ Returns the item instance by finding its unique UUID """
         return self._getitem(uuid_)
 
     def getdata(self, uuid_) -> dict:
-        """ Returns the data dictionary """
+        """
+        Returns the dictionary containing all the data contained
+        in the class instance. The first item in the dict is always
+        the ItemID, then the UUID, and then the ItemType. Note that
+        this is a one way operation, and the values within the item
+        instance will not be changed when the dict is changed.
+        """
         return self._getitem(uuid_).DATA
 
     def getuuid(self, iid_):
-        """ Get the UUID of the first object with the ItemID """
+        """
+        Returns the UUID of the first object found in the inventory
+        with the matching ItemID
+        """
         return self._getuuid(iid_)
 
     def getuuids(self, iid_):
-        """ Gets the list of matching ItemIDs """
+        """
+        Returns the list of all UUIDs of the objects that match
+        the given ItemID.
+        """
         for i in self.REGISTER:
             if i.ITEMID == iid_:
                 yield i.UUID
 
-    def new(self, iid: str, itemtype: str, **kwargs):
-        """ Adds a new item to the register """
-        uuid_ = str(uuid.uuid4())
-        try:
-            exec(f"self.{iid} = itype.{itemtype}('{iid}', '{uuid_}', kwargs)")
-            exec(f"self.REGISTER.append(self.{iid})")
-        except KeyError:
-            print(f"[!] Not enough data passed for '{iid}'")
+    def new(self, iid: str, amount: int = 1):
+        """
+        Creates a new item instance and adds the pointer to the
+        register. For this to not raise an error, enough data
+        needs to be passed. Import note: the data needs to be
+        passed in a specific order to work for sure.
 
-        # Voiding
-        type(kwargs)
-        type(self)
+        > Player.INVENTORY.new('apple', 'Food', amount=12, ...)
+        args -> ( ItemID, ItemType, **kwargs )
+
+        If 3 or more normal arguments will be passed, it will
+        raise an error.
+        """
+        uuid_ = str(uuid.uuid4())
+
+        try:
+            # Fetching the item registry data
+            with open('src/ItemRegistry.json') as f:
+                iregister = json.loads(f.read())
+
+                kwargs = iregister[iid]
+                kwargs['amount'] = amount
+                itemtype = kwargs['type']
+
+                del kwargs['type']
+
+            # Creating the object instance and appending it to the register
+            setattr(self, iid, eval(f"itype.{itemtype}('{iid}', '{uuid_}', kwargs)"))
+            exec(f"self.REGISTER.append(self.{iid})")
+
+        except KeyError:
+            print(f"[!] '{iid}' has not been registered yet")
+
 
     def delete(self, uuid_):
         """ Removes a item """
@@ -134,13 +167,13 @@ class _Inventory:
     def add(self, uuid_, amount):
         """ Adds a certain amount of items to the object """
         item = self._getitem(uuid_)
-        item.DATA['amount'] += amount
+        item.AMOUNT += amount
 
     def remove(self, uuid_, amount):
         """ Removes a certain the amount of items from the object """
         item = self._getitem(uuid_)
-        if item.DATA['amount'] >= amount:
-            item.DATA['amount'] -= amount
+        if item.AMOUNT >= amount:
+            item.AMOUNT -= amount
         else:
             raise InventoryError('Cannot remove more items then there is')
 
@@ -159,6 +192,14 @@ class _Inventory:
         """ Returns the uuids of the objects """
         uuids = list(ptr.UUID for ptr in self.REGISTER)
         return uuids
+
+    @property
+    def lastuuid(self):
+        """ Returns the UUID of the newest item in the register """
+        try:
+            return self.REGISTER[-1].UUID
+        except KeyError:
+            return None
 
 
 class _Wallet:
