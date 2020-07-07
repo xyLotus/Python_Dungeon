@@ -33,14 +33,7 @@ class Main:
 
         # Game
 
-        self.Player.INVENTORY.new('apple', 12)
-        apple_uuid = self.Player.INVENTORY.lastuuid
-        self.Player.INVENTORY.new('paper', 3)
-        self.Player.INVENTORY.add(apple_uuid, 123)
-
-
-        apple_item = self.Player.INVENTORY.uget(apple_uuid)
-        print(apple_item.NAME, '->', apple_item.AMOUNT)
+        self.Player.INVENTORY.new('apple', 3)
 
 
 # Game initialization and screen hold
