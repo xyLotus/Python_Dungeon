@@ -26,6 +26,21 @@ For better readability, printing the `INVENTORY` itself will yield a string of I
 > `Food.apple, Weapon.sword`
 
 ___
+#### Creating a new item
+First, to add a new item instance to the registry you **need to be sure it's registered** with all the default
+data in `src/ItemRegistry.json` (a quick peek at that file will tell you how to do so). After registering the item
+you can create a instance using `new()` by passing through the ItemID and the amount. The amount should be passed only 
+when the ItemType is a `Stackable` item. Passing the amount for items like weapons or armor is a bad idea, but if that
+happens there are safety features in place.
+```python
+# Creating a new item
+self.Player.INVENTORY.new(<ItemID>, <amount>) 
+```
+**Note:** If the item has not been registered properly, `new()` will raise a warning.
+> `[!] '<ItemID>' has not been registered yet`
+
+
+___
 #### Getting the UUID of an item
 There is two ways of doing this, either using `getuuid()` or accesing the items in the registry.
 The first way is only if you have a single item with the ItemID.
@@ -36,6 +51,10 @@ uuid = self.Player.INVENTORY.getuuid(<ItemID>)
 
 # Second way (will return a list of them for each item with the matching ItemID)
 uuids = list(self.Player.INVENTORY.getuuids(<ItemID>)
+```
+You can also get the UUID of the newest object created using
+```python
+uuid = self.Player.INVENTORY.lastuuid
 ```
 ___
 #### Getting a item object
@@ -63,15 +82,13 @@ Example:
 
 **Note**: this only works for a UUID, not for a ItemID. 
 ___
-#### Creating and modifying items
+#### Modifying items
 After getting the item, operations can be done on the item object directly changing its values,
-or using Inventory methods to do so.
+or using Inventory methods to do so. All the data is specified in the ItemRegistry file, so the only thing
+you need to pass is the ItemID (and amount if more than 1).
 
 Using Inventory methods:
 ```python
-# Creating a new item
-self.Player.INVENTORY.new(<ItemID>, <ItemType>, amount=<amount>, ...) 
-
 # Deleting a item
 self.Player.INVENTORY.delete(<UUID>)
 
@@ -154,4 +171,5 @@ Examples
 ```
 
 ## What not to do:
-- Do not `import main` **anywhere** because it will most likely result in a `RecursionError` 
+- Do not `import main` **anywhere** because it will most likely result in a `RecursionError`
+- Add the amount argument to items from a ItemType that does NOT derive from `Stackable`
